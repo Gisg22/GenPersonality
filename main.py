@@ -126,6 +126,9 @@ def get_speciality(age):
     if age <= 22:
         speciality_1.append('Student')
         return speciality_1
+    if age >= 75:
+        speciality_1.append('Pensioner')
+        return speciality_1
     speciality_requests = requests.get('https://www.careerprofiles.info/top-100-careers.html', headers=headers)
     speciality_soup = BeautifulSoup(speciality_requests.text, 'lxml')
     table_speciality = speciality_soup.find('table').find_all('a')
