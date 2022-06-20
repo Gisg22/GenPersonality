@@ -141,16 +141,20 @@ def get_person():
     gender = ['woman', 'man']
     random_index = random.randint(0, len(gender) - 1)
     return_gender = gender[random_index]
+    date_birthday = get_date_birthday()
+    date_now = datetime.datetime.now().year
+    age = date_now - date_birthday.year
+
     return person(name=get_name(return_gender), surname=get_surname(),
                   bat_habits=get_bad_habits(), contry=get_country_and_city(),
-                  gender=return_gender, date_birthday=get_date_birthday(),
+                  gender=return_gender, date_birthday=date_birthday,
                   hobby=get_hobby(),
-                  speciality=get_speciality(random.randint(6, 90)))
+                  speciality=get_speciality(age=age))
 
 
 def main():
-    personality = get_person()
-    personality.print_person()
+     personality = get_person()
+     personality.print_person()
 
 
 
