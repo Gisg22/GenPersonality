@@ -31,41 +31,38 @@ def get_name(gender):
         table_list = soup_name_woman.find('div', class_='tablobertka').find_all('p')
         woman_names = []
         for w in table_list:
-            woman_names.append(translator.translate(w.text.strip('	 ')).text)
+            woman_names.append(w.text.strip('	 '))
         random_index = random.randint(0, len(woman_names) - 1)
-        return woman_names[random_index]
+        return translator.translate(woman_names[random_index]).text
 
 
 def get_surname():
+    translator = Translator()
     req_surname_rus = requests.get(url='https://ru.wikipedia.org/wiki/Список_общерусских_фамилий', headers=headers)
     req_surname_ukr = requests.get(
         url='https://ru.wiktionary.org/wiki/%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F:%D0%A3%D0%BA%D1%80%D0%B0%D0%B8%D0%BD%D1%81%D0%BA%D0%B8%D0%B5_%D1%84%D0%B0%D0%BC%D0%B8%D0%BB%D0%B8%D0%B8/ru',
         headers=headers)
-    req_surname_euro = requests.get(
-        url='https://englishlib.org/%D0%B8%D0%BD%D0%BE%D1%81%D1%82%D1%80%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5-%D1%84%D0%B0%D0%BC%D0%B8%D0%BB%D0%B8%D0%B8-%D0%BF%D0%BE-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B8.html',
-        headers=headers)
     soup_surname_rus = BeautifulSoup(req_surname_rus.text, 'lxml')
     soup_surname_ukr = BeautifulSoup(req_surname_ukr.text, 'lxml')
-    soup_surname_euro = BeautifulSoup(req_surname_euro.text, 'lxml')
     columns_rus = soup_surname_rus.find('div', class_='columns').find_all('li')
     groups_ukr = soup_surname_ukr.find('div', class_='mw-category mw-category-columns').find_all('li')
-    table_class_euro = soup_surname_euro.find('table', class_='tourist-table table-50x50').find_all('tr')
     rus_surnames = []
     ukr_surnames = []
-    euro_surnames = []
     for r in columns_rus:
         rus_surnames.append(r.text)
     for u in groups_ukr:
         ukr_surnames.append(u.text)
-    for e in table_class_euro:
-        euro_surnames.append(e.find_next('td').text)
+    with open('jsonfiles/surnames.json') as file:
+        euro_surnames = json.load(file)
     all_surnames = rus_surnames + ukr_surnames + euro_surnames
     random_index = random.randint(0, len(all_surnames) - 1)
-    return all_surnames[random_index]
+    return translator.translate(all_surnames[random_index]).text
 
 
 def get_date_birthday():
-    return datetime.date(random.randint(1, 29), random.randint(1, 12), random.randint(1930, 2010))
+    return datetime.date(day=random.randint(1, 26),
+                         month=random.randint(1, 12),
+                         year=random.randint(1930, 2010))
 
 
 def get_country_and_city():
@@ -97,6 +94,10 @@ def get_bad_habits():
     for i in bad_habits_1:
         if i not in bad_habits_2:
             bad_habits_2.append(i)
+    for b in bad_habits_2:
+        if b == 'Learn how to take control of your habits. Click Here.':
+            bad_habits_2.remove('Learn how to take control of your habits. Click Here.')
+
     return bad_habits_2
 
 
@@ -149,7 +150,8 @@ def get_person():
 
 def main():
     personality = get_person()
-    print(personality)
+    personality.print_person()
+
 
 
 if __name__ == '__main__':
